@@ -12,6 +12,17 @@ params:
   ShowPostNavLinks: true     # 显示上一篇/下一篇
   ShowBreadCrumbs: true      # 显示面包屑导航
   ShowCodeCopyButtons: true  # 代码块显示复制按钮
+  author: "uestc-fleetsnowfluff"
+  homeInfoParams:
+    Title: "你好，我是uestc-fleetsnowfluff"
+    Content: "欢迎来到我的博客，这里记录我的学习和生活。"
+  profileMode:
+    enabled: true            # 开启首页个人资料模式
+    title: "uestc-fleetsnowfluff"
+    subtitle: "ML开发 / 热爱生活"
+    imageUrl: "images/avatar.jpg" # 这里的路径对应 static 文件夹里的图片
+    imageWidth: 120          # 头像宽度
+    imageHeight: 120         # 头像高度
 
 # 顶部导航菜单
 menu:
