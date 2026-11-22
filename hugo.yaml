@@ -19,7 +19,7 @@ params:
     enabled: true            # 开启首页个人资料模式
     title: "uestc-fleetsnowfluff"
     subtitle: "ML开发+生活"
-    imageUrl: "images/avatar.jpg" # 这里的路径对应 static 文件夹里的图片
+    imageUrl: "/images/avatar.jpg" # 这里的路径对应 static 文件夹里的图片
     imageWidth: 120          # 头像宽度
     imageHeight: 120         # 头像高度
 
