@@ -1,0 +1,52 @@
+
+/* 只给首页设置背景图 */
+/* ==========================================
+   1. 亮色模式下的首页背景
+   ========================================== */
+html[data-theme="light"] body.home {
+    background-image: url('/images/bg.jpg'); /* 换成你的亮色背景图 */
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* ==========================================
+   2. 暗色模式下的首页背景
+   ========================================== */
+html[data-theme="dark"] body.list {
+    background-image: url('/images/bg.jpg'); /* 换成你的暗色背景图 */
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* 如果上面的 body.home 不生效，可以尝试这个更通用的选择器 */
+body.list {
+    background-image: url('/images/bg.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+/* 亮色模式下的内容区域 */
+.main {
+    background-color: rgba(255, 254, 241, 0.85); /* 白色，85%不透明度 */
+    border-radius: 8px; /* 圆角，看起来更柔和 */
+    padding: 20px;
+}
+
+/* 暗色模式下的内容区域 */
+:root[data-theme="dark"] .main {
+    background-color: rgba(0, 0, 0, 0.75); /* 黑色，75%不透明度 */
+}
+/* 暗色模式下的内容区域 */
+:root[data-theme="dark"] .main {
+    background-color: rgba(0, 0, 0, 0.75); /* 黑色，75%不透明度 */
+}
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
