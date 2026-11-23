@@ -33,46 +33,65 @@ body.list {
 /* ==========================================
    1. 基础设置与宽度调整
    ========================================== */
+/* ==========================================
+   1. 全局宽度调整（覆盖首页和文章页）
+   ========================================== */
 :root {
-    --main-width: 900px; /* 调整内容区（遮罩）的宽度，你可以根据需要修改 */
+    --main-width: 900px; /* 全局宽度，建议 800 - 1000 之间 */
+}
+
+/* 针对 PaperMod 首页（Profile 模式）可能存在的特殊宽度限制进行覆盖 */
+.main.profile {
+    max-width: var(--main-width) !important;
+}
+
+/* 确保内部内容宽度也撑开 */
+.main {
+    max-width: var(--main-width) !important;
+    margin: 0 auto; /* 保证居中对齐 */
 }
 
 /* ==========================================
-   2. 亮色模式下的首页背景与遮罩
+   2. 全局半透明遮罩（亮色模式）
+   ========================================== */
+html[data-theme="light"] .main {
+    background-color: rgba(255, 254, 241, 0.85); /* 暖白色遮罩 */
+    border-radius: 8px;
+    padding: 30px; /* 增加一点内边距，让内容不贴边 */
+    box-sizing: border-box; /* 保证 padding 不会撑大整体宽度 */
+}
+
+/* ==========================================
+   3. 全局半透明遮罩（暗色模式）
+   ========================================== */
+html[data-theme="dark"] .main {
+    background-color: rgba(0, 0, 0, 0.75); /* 黑色遮罩 */
+    border-radius: 8px;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+/* ==========================================
+   4. 首页专属背景（仅首页生效，文章页不受影响）
    ========================================== */
 html[data-theme="light"] body.home {
-    background-image: url('/images/bg-light.jpg'); /* 你的亮色背景图 */
+    background-image: url('/images/bg-light.jpg'); 
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
     background-repeat: no-repeat;
 }
 
-html[data-theme="light"] .main {
-    background-color: rgba(255, 254, 241, 0.85); /* 偏暖的白色，85%不透明度 */
-    border-radius: 8px;
-    padding: 20px;
-}
-
-/* ==========================================
-   3. 暗色模式下的首页背景与遮罩
-   ========================================== */
 html[data-theme="dark"] body.home {
-    background-image: url('/images/bg-dark.jpg'); /* 你的暗色背景图 */
+    background-image: url('/images/bg-dark.jpg'); 
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
     background-repeat: no-repeat;
 }
 
-html[data-theme="dark"] .main {
-    background-color: rgba(0, 0, 0, 0.75); /* 黑色，75%不透明度 */
-    border-radius: 8px;
-    padding: 20px;
-}
-
 /* ==========================================
-   4. 页面切换丝滑动画 (View Transitions)
+   5. 页面切换丝滑动画
    ========================================== */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition {
