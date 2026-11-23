@@ -30,21 +30,50 @@ body.list {
     background-position: center;
     background-repeat: no-repeat;
 }
-/* 亮色模式下的内容区域 */
-.main {
-    background-color: rgba(255, 254, 241, 0.85); /* 白色，85%不透明度 */
-    border-radius: 8px; /* 圆角，看起来更柔和 */
+/* ==========================================
+   1. 基础设置与宽度调整
+   ========================================== */
+:root {
+    --main-width: 900px; /* 调整内容区（遮罩）的宽度，你可以根据需要修改 */
+}
+
+/* ==========================================
+   2. 亮色模式下的首页背景与遮罩
+   ========================================== */
+html[data-theme="light"] body.home {
+    background-image: url('/images/bg-light.jpg'); /* 你的亮色背景图 */
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+html[data-theme="light"] .main {
+    background-color: rgba(255, 254, 241, 0.85); /* 偏暖的白色，85%不透明度 */
+    border-radius: 8px;
     padding: 20px;
 }
 
-/* 暗色模式下的内容区域 */
-:root[data-theme="dark"] .main {
-    background-color: rgba(0, 0, 0, 0.75); /* 黑色，75%不透明度 */
+/* ==========================================
+   3. 暗色模式下的首页背景与遮罩
+   ========================================== */
+html[data-theme="dark"] body.home {
+    background-image: url('/images/bg-dark.jpg'); /* 你的暗色背景图 */
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
 }
-/* 暗色模式下的内容区域 */
-:root[data-theme="dark"] .main {
+
+html[data-theme="dark"] .main {
     background-color: rgba(0, 0, 0, 0.75); /* 黑色，75%不透明度 */
+    border-radius: 8px;
+    padding: 20px;
 }
+
+/* ==========================================
+   4. 页面切换丝滑动画 (View Transitions)
+   ========================================== */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition {
     navigation: auto;
