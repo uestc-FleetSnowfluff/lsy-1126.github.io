@@ -90,13 +90,31 @@ html[data-theme="dark"] body.home {
     background-repeat: no-repeat;
 }
 
-/* ==========================================
-   5. 页面切换丝滑动画
-   ========================================== */
+/* 调整页面切换动画的时间和效果 */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition {
     navigation: auto;
   }
+  
+  /* 旧页面淡出：时间 0.6 秒，慢速平滑 */
+  ::view-transition-old(root) {
+    animation: 0.5s ease-in both fade-out;
+  }
+
+  /* 新页面淡入：时间 0.6 秒，慢速平滑 */
+  ::view-transition-new(root) {
+    animation: 0.8s ease-out both fade-in;
+  }
+}
+
+/* 定义淡出关键帧 */
+@keyframes fade-out {
+  to { opacity: 0; }
+}
+
+/* 定义淡入关键帧 */
+@keyframes fade-in {
+  from { opacity: 0; }
 }
 /* ==========================================
    1. 定义动画关键帧
