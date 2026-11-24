@@ -3,7 +3,7 @@
 /* ==========================================
    1. 亮色模式下的首页背景
    ========================================== */
-html[data-theme="light"] body.home {
+html[data-theme="light"] body.list {
     background-image: url('/images/bg.jpg'); /* 换成你的亮色背景图 */
     background-size: cover;
     background-attachment: fixed;
@@ -15,20 +15,37 @@ html[data-theme="light"] body.home {
    2. 暗色模式下的首页背景
    ========================================== */
 html[data-theme="dark"] body.list {
-    background-image: url('/images/bg.jpg'); /* 换成你的暗色背景图 */
+    background-image: url('/images/dark_background.jpg'); /* 换成你的暗色背景图 */
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
     background-repeat: no-repeat;
 }
+/* ==========================================
+   给友链页面单独加背景
+   ========================================== */
 
-/* 如果上面的 body.home 不生效，可以尝试这个更通用的选择器 */
-body.list {
-    background-image: url('/images/bg.jpg');
-    background-size: cover;
-    background-attachment: fixed;
-    background-position: center;
-    background-repeat: no-repeat;
+/* 亮色模式下的友链页背景 */
+/* ==========================================
+   强制给友链页（及带有 top 类的页面）加背景
+   ========================================== */
+
+/* 亮色模式 */
+html[data-theme="light"] body#top {
+    background-image: url('/images/light_bg.jpg') !important; /* 换成你的图片名 */
+    background-size: cover !important;
+    background-attachment: fixed !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+/* 暗色模式 */
+html[data-theme="dark"] body#top {
+    background-image: url('/images/dark_background.jpg') !important;
+    background-size: cover !important;
+    background-attachment: fixed !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
 }
 /* ==========================================
    1. 基础设置与宽度调整
@@ -55,7 +72,7 @@ body.list {
    2. 全局半透明遮罩（亮色模式）
    ========================================== */
 html[data-theme="light"] .main {
-    background-color: rgba(255, 254, 241, 0.85); /* 暖白色遮罩 */
+    background-color: rgba(255, 254, 241, 0.8); /* 暖白色遮罩 */
     border-radius: 8px;
     padding: 30px; /* 增加一点内边距，让内容不贴边 */
     box-sizing: border-box; /* 保证 padding 不会撑大整体宽度 */
@@ -65,7 +82,7 @@ html[data-theme="light"] .main {
    3. 全局半透明遮罩（暗色模式）
    ========================================== */
 html[data-theme="dark"] .main {
-    background-color: rgba(0, 0, 0, 0.75); /* 黑色遮罩 */
+    background-color: rgba(0, 0, 0, 0.5); /* 黑色遮罩 */
     border-radius: 8px;
     padding: 30px;
     box-sizing: border-box;
@@ -157,4 +174,17 @@ body.list .profile_inner .social-icons {
 /* 下方的文章列表 (延迟 0.8s) */
 body.list .post-entry {
     animation: fadeInUp 0.8s ease-out 0.8s both;
+}
+/* ==========================================
+   亮暗模式丝滑切换过渡
+   ========================================== */
+
+/* 给全局元素添加颜色和背景的过渡动画 */
+body, .main, .header, .footer, .post-entry, a, h1, h2, h3, h4, p, span, div {
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease !important;
+}
+
+/* 背景图不需要颜色过渡，但可以用透明度过渡（可选） */
+body {
+    transition: background-image 0.4s ease, background-color 0.4s ease, color 0.4s ease !important;
 }
