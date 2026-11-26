@@ -1,0 +1,101 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "小爱弥斯.moc3",
+		"Textures": [
+			"小爱弥斯.4096/texture_00.png",
+			"小爱弥斯.4096/texture_01.png"
+		],
+		"Physics": "小爱弥斯.physics3.json",
+		"DisplayInfo": "小爱弥斯.cdi3.json",
+		"Expressions": [
+			{ "Name": "脸红", "File": "表情-脸红.exp3.json" },
+			{ "Name": "哭", "File": "表情-哭.exp3.json" },
+			{ "Name": "可怜", "File": "表情-可怜.exp3.json" },
+			{ "Name": "呆", "File": "表情-呆.exp3.json" },
+			{ "Name": "晕", "File": "表情-晕.exp3.json" },
+			{ "Name": "横眼", "File": "表情-横眼.exp3.json" },
+			{ "Name": "生气", "File": "表情-生气.exp3.json" },
+			{ "Name": "豆豆眼", "File": "表情-豆豆眼.exp3.json" },
+			{ "Name": "黑化", "File": "表情-黑化.exp3.json" },
+			{ "Name": "》《", "File": "表情-》《.exp3.json" }
+		],
+		"Motions": {
+			"Idle": [
+				{ "File": "动画/长动画/待机.motion3.json", "FadeInTime": 0.8, "FadeOutTime": 0.8 },
+				{ "File": "动画/长动画/发呆.motion3.json", "FadeInTime": 0.8, "FadeOutTime": 0.8 },
+				{ "File": "动画/长动画/困.motion3.json", "FadeInTime": 0.8, "FadeOutTime": 0.8 }
+			],
+			"Thinking": [
+				{ "File": "动画/表情/点头.motion3.json", "FadeInTime": 0.3, "FadeOutTime": 0.3 },
+				{ "File": "动画/表情/惊讶.motion3.json", "FadeInTime": 0.3, "FadeOutTime": 0.3 }
+			],
+			"Error": [
+				{ "File": "动画/表情/摇头.motion3.json", "FadeInTime": 0.3, "FadeOutTime": 0.3 },
+				{ "File": "动画/表情/哭.motion3.json", "FadeInTime": 0.3, "FadeOutTime": 0.3 }
+			],
+			"Done": [
+				{ "File": "动画/短动画/跳一下.motion3.json", "FadeInTime": 0.2, "FadeOutTime": 0.3 },
+				{ "File": "动画/长动画/剪刀手.motion3.json", "FadeInTime": 0.2, "FadeOutTime": 0.3 }
+			],
+			"Waiting": [
+				{ "File": "动画/表情/点头.motion3.json", "FadeInTime": 0.3, "FadeOutTime": 0.3 }
+			],
+			"Delivered": [
+				{ "File": "动画/长动画/抱抱.motion3.json", "FadeInTime": 0.3, "FadeOutTime": 0.4 },
+				{ "File": "动画/长动画/剪刀手.motion3.json", "FadeInTime": 0.2, "FadeOutTime": 0.3 }
+			],
+			"TapHead": [
+				{ "File": "动画/短动画/戳左边头.motion3.json", "FadeInTime": 0.15, "FadeOutTime": 0.25 },
+				{ "File": "动画/短动画/戳右边头.motion3.json", "FadeInTime": 0.15, "FadeOutTime": 0.25 },
+				{ "File": "动画/短动画/戳左猫耳.motion3.json", "FadeInTime": 0.15, "FadeOutTime": 0.25 },
+				{ "File": "动画/短动画/戳右猫耳.motion3.json", "FadeInTime": 0.15, "FadeOutTime": 0.25 }
+			],
+			"TapFace": [
+				{ "File": "动画/短动画/戳脸.motion3.json", "FadeInTime": 0.15, "FadeOutTime": 0.25 },
+				{ "File": "动画/短动画/戳左眼睛.motion3.json", "FadeInTime": 0.15, "FadeOutTime": 0.25 },
+				{ "File": "动画/短动画/戳右眼睛.motion3.json", "FadeInTime": 0.15, "FadeOutTime": 0.25 },
+				{ "File": "动画/表情/笑.motion3.json", "FadeInTime": 0.2, "FadeOutTime": 0.3 },
+				{ "File": "动画/表情/脸红.motion3.json", "FadeInTime": 0.2, "FadeOutTime": 0.3 }
+			],
+			"TapBody": [
+				{ "File": "动画/长动画/抱抱.motion3.json", "FadeInTime": 0.2, "FadeOutTime": 0.3 },
+				{ "File": "动画/长动画/捂嘴笑.motion3.json", "FadeInTime": 0.2, "FadeOutTime": 0.3 },
+				{ "File": "动画/短动画/戳脸.motion3.json", "FadeInTime": 0.15, "FadeOutTime": 0.25 }
+			],
+			"TapArm": [
+				{ "File": "动画/长动画/剪刀手.motion3.json", "FadeInTime": 0.2, "FadeOutTime": 0.3 },
+				{ "File": "动画/长动画/纸飞机.motion3.json", "FadeInTime": 0.2, "FadeOutTime": 0.3 },
+				{ "File": "动画/长动画/食指.motion3.json", "FadeInTime": 0.2, "FadeOutTime": 0.3 }
+			],
+			"TapLeg": [
+				{ "File": "动画/短动画/跳一下.motion3.json", "FadeInTime": 0.15, "FadeOutTime": 0.25 },
+				{ "File": "动画/短动画/脚往右.motion3.json", "FadeInTime": 0.15, "FadeOutTime": 0.25 }
+			],
+			"Extra": [
+				{ "File": "动画/其他/猫耳.motion3.json", "FadeInTime": 0.3, "FadeOutTime": 0.3 },
+				{ "File": "动画/其他/猫耳消失.motion3.json", "FadeInTime": 0.3, "FadeOutTime": 0.3 },
+				{ "File": "动画/其他/翅膀.motion3.json", "FadeInTime": 0.3, "FadeOutTime": 0.3 },
+				{ "File": "动画/其他/翅膀入场.motion3.json", "FadeInTime": 0.3, "FadeOutTime": 0.3 },
+				{ "File": "动画/其他/翅膀消失.motion3.json", "FadeInTime": 0.3, "FadeOutTime": 0.3 }
+			]
+		}
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": [
+				"ParamEyeROpen",
+				"ParamEyeLOpen"
+			]
+		},
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": [
+				"ParamMouthOpenY"
+			]
+		}
+	]
+}

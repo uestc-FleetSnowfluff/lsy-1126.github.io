@@ -1,0 +1,697 @@
+{{- /*
+  Live2D 看板娘（pixi-live2d-display + Cubism 4）
+  - 分区点击：头 / 脸 / 身体 / 左臂 / 右臂 / 腿
+  - 点击播放对应动作组并弹出对话气泡
+  - 加载失败时静默降级，不影响博客正文
+  - 调试：URL 加 ?live2d=zones 显示分区；控制台 window.__live2dPet
+*/ -}}
+<style>
+  #live2d-pet {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 60;
+    pointer-events: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #live2d-pet .lp-stage {
+    position: relative;
+    pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease;
+  }
+  #live2d-pet .lp-canvas {
+    display: block;
+    pointer-events: auto;
+    touch-action: pan-y;
+    outline: none;
+    border-radius: 18px;
+    filter: drop-shadow(0 10px 22px rgba(0, 0, 0, .18));
+  }
+  #live2d-pet .lp-canvas:focus-visible {
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, .65);
+  }
+  #live2d-pet .lp-bubble {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 10px);
+    transform: translate(-50%, 6px);
+    max-width: 230px;
+    min-width: 96px;
+    padding: 9px 13px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .97);
+    color: #26303d;
+    font-size: 13px;
+    line-height: 1.55;
+    text-align: center;
+    word-break: break-word;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .16);
+    border: 1px solid rgba(148, 163, 184, .28);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease, visibility .18s;
+  }
+  #live2d-pet .lp-bubble::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    width: 12px;
+    height: 12px;
+    margin-left: -6px;
+    background: inherit;
+    border-right: 1px solid rgba(148, 163, 184, .28);
+    border-bottom: 1px solid rgba(148, 163, 184, .28);
+    transform: rotate(45deg);
+    border-bottom-right-radius: 3px;
+  }
+  #live2d-pet .lp-bubble.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+  }
+  [data-theme="dark"] #live2d-pet .lp-bubble,
+  .dark #live2d-pet .lp-bubble {
+    background: rgba(30, 41, 59, .97);
+    color: #e2e8f0;
+    border-color: rgba(148, 163, 184, .35);
+  }
+  #live2d-pet .lp-tools {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s ease;
+  }
+  #live2d-pet .lp-stage:hover .lp-tools,
+  #live2d-pet .lp-tools:focus-within {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #live2d-pet .lp-btn {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .9);
+    color: #475569;
+    font-size: 13px;
+    line-height: 26px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .18);
+  }
+  #live2d-pet .lp-btn:hover { background: #fff; color: #0f172a; }
+  #live2d-pet .lp-loading {
+    position: absolute;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .82);
+    color: #64748b;
+    font-size: 12px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  #live2d-pet[data-state="ready"] .lp-loading,
+  #live2d-pet[data-state="failed"] .lp-loading { display: none; }
+  #live2d-pet .lp-failed {
+    display: none;
+    position: absolute;
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: #94a3b8;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  #live2d-pet[data-state="failed"] .lp-failed { display: block; }
+  #live2d-pet[data-state="hidden"] .lp-stage { display: none; }
+  #live2d-pet .lp-reopen {
+    display: none;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .94);
+    box-shadow: 0 6px 18px rgba(15, 23, 42, .2);
+    font-size: 20px;
+    line-height: 44px;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  #live2d-pet[data-state="hidden"] .lp-reopen { display: block; }
+  @media (max-width: 640px) {
+    #live2d-pet { right: 10px; bottom: 12px; }
+    #live2d-pet .lp-bubble { max-width: 168px; font-size: 12px; }
+  }
+  /* PaperMod 的“回到顶部”按钮默认也在右下角，挪到看板娘左侧，避免遮挡 */
+  @media (min-width: 641px) {
+    .top-link { right: calc(18px + 250px + 20px); }
+  }
+  @media (max-width: 640px) {
+    .top-link { right: calc(10px + min(180px, 42vw) + 16px); bottom: 3rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #live2d-pet .lp-stage,
+    #live2d-pet .lp-bubble { transition: none; }
+  }
+</style>
+
+<div id="live2d-pet" data-state="loading" aria-label="Live2D 看板娘">
+  <div class="lp-stage">
+    <div class="lp-bubble" role="status" aria-live="polite"></div>
+    <canvas class="lp-canvas" width="240" height="340" tabindex="0"
+            aria-label="小爱弥斯，点击头部、脸、身体、手臂或腿会有不同反应"></canvas>
+    <div class="lp-loading">看板娘加载中…</div>
+    <div class="lp-failed">看板娘走丢了…</div>
+    <div class="lp-tools">
+      <button type="button" class="lp-btn" data-act="talk" title="和她说说话" aria-label="和她说说话">💬</button>
+      <button type="button" class="lp-btn" data-act="hide" title="隐藏看板娘" aria-label="隐藏看板娘">✕</button>
+    </div>
+  </div>
+  <button type="button" class="lp-reopen" data-act="show" title="显示看板娘" aria-label="显示看板娘">🐾</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js"></script>
+<script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism4.min.js"></script>
+
+<script>
+(function () {
+  "use strict";
+
+  var root = document.getElementById("live2d-pet");
+  if (!root) return;
+
+  var canvas = root.querySelector(".lp-canvas");
+  var bubble = root.querySelector(".lp-bubble");
+  var stage = root.querySelector(".lp-stage");
+  var loading = root.querySelector(".lp-loading");
+
+  var MODEL_URL = "{{ "live2d/小爱弥斯_vts/小爱弥斯.model3.json" | relURL }}";
+  var STORAGE_KEY = "live2d-pet-hidden";
+  var SHOW_ZONES = /(?:^|[?&])live2d=zones(?:&|$)/.test(window.location.search);
+
+  // 分区阈值（相对模型包围盒，0~1）。可用 ?live2d=zones 对照色块微调。
+  var CUTS = {
+    headMaxNy: 0.32, // 头/脸 与 身体的分界（下巴附近）
+    faceMinNy: 0.05, // 头顶（头发、猫耳）留给 head
+    faceMinNx: 0.20, // 脸的左右边界
+    faceMaxNx: 0.80,
+    bodyMinNx: 0.29, // 身体中列左右边界，外侧算手臂
+    bodyMaxNx: 0.71,
+    legMinNy: 0.62 // 腿的起始高度
+  };
+
+  var REGION_MOTION = {
+    head: "TapHead",
+    face: "TapFace",
+    body: "TapBody",
+    armL: "TapArm",
+    armR: "TapArm",
+    leg: "TapLeg"
+  };
+
+  var LINES = {
+    welcome: [
+      "你好呀，我是小爱弥斯～ 点点我试试看！",
+      "终于等到你啦，今天也来博客逛逛吗？",
+      "咦，你来啦！我在这里等你很久了哦。"
+    ],
+    head: [
+      "唔…头发要乱啦～",
+      "摸头会长不高的！",
+      "猫耳不可以乱戳啦！",
+      "再摸一下…就一下下哦。"
+    ],
+    face: [
+      "被、被你发现我在偷看你了…",
+      "脸红了啦，不许看！",
+      "再戳我就要生气了哦。",
+      "眼睛里只有你一个人哦。"
+    ],
+    body: [
+      "抱一下？就一下下。",
+      "衣服会皱的啦…",
+      "嘿嘿，有点痒。",
+      "今天也辛苦啦，休息一下吧。"
+    ],
+    armL: [
+      "要一起玩吗？",
+      "手给你牵一会儿。",
+      "诶？想拉我去哪呀。"
+    ],
+    armR: [
+      "看，我能比剪刀手！",
+      "纸飞机要飞咯～",
+      "指给你看，那边有彩虹。"
+    ],
+    leg: [
+      "别、别碰那里啦！",
+      "要跳给你看吗？",
+      "站久了腿会酸的…"
+    ],
+    idle: [
+      "今天也要加油呀。",
+      "偷偷看看你在做什么…",
+      "博客写得怎么样啦？",
+      "窗外的天气好像不错呢。",
+      "需要我陪你说说话吗？"
+    ],
+    talk: [
+      "在呢在呢，想聊什么？",
+      "我一直都在这里哦。",
+      "今天的你，也有一点可爱。",
+      "要不要休息一下，喝口水？"
+    ]
+  };
+
+  var state = {
+    app: null,
+    model: null,
+    ready: false,
+    hidden: false,
+    size: { w: 0, h: 0 },
+    lastLine: "",
+    lastMotion: null,
+    lastMotionFinished: 0,
+    lastHeadTap: 0,
+    booting: false
+  };
+
+  function pick(list, avoid) {
+    if (!list || !list.length) return "";
+    if (list.length === 1) return list[0];
+    var pool = avoid ? list.filter(function (x) { return x !== avoid; }) : list;
+    if (!pool.length) pool = list;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function say(text) {
+    if (!text) return;
+    state.lastLine = text;
+    bubble.textContent = text;
+    bubble.classList.add("is-visible");
+    clearTimeout(say._timer);
+    var hold = Math.max(2600, Math.min(7000, 1800 + text.length * 110));
+    say._timer = setTimeout(function () {
+      bubble.classList.remove("is-visible");
+    }, hold);
+  }
+
+  function petSize() {
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    var w = vw < 640 ? Math.max(132, Math.min(180, Math.round(vw * 0.42))) : 250;
+    var h = Math.round(w * 1.42);
+    var maxH = Math.round(vh * 0.60);
+    if (h > maxH) {
+      h = maxH;
+      w = Math.round(h / 1.42);
+    }
+    return { w: Math.max(96, w), h: Math.max(136, h) };
+  }
+
+  function applySize() {
+    var s = petSize();
+    if (s.w === state.size.w && s.h === state.size.h) return;
+    state.size = s;
+    canvas.style.width = s.w + "px";
+    canvas.style.height = s.h + "px";
+    if (state.app) {
+      state.app.renderer.resize(s.w, s.h);
+      fitModel();
+    }
+  }
+
+  function fitModel() {
+    var model = state.model;
+    if (!model || !state.app) return;
+    var w = state.size.w;
+    var h = state.size.h;
+    try {
+      model.anchor.set(0.5, 0.5);
+      model.scale.set(1);
+      model.position.set(0, 0);
+      var b = model.getBounds();
+      if (!(b.width > 0 && b.height > 0)) return;
+      var scale = Math.min((w * 0.98) / b.width, (h * 0.98) / b.height);
+      model.scale.set(scale);
+      model.position.set(w / 2, h / 2);
+      positionBubble();
+    } catch (err) {
+      console.warn("[live2d] fit failed", err);
+    }
+  }
+
+  // 气泡贴着模型头顶，而不是贴着画布顶部（模型包围盒通常含透明留白）
+  function positionBubble() {
+    var model = state.model;
+    if (!model || !bubble) return;
+    try {
+      var b = model.getBounds();
+      if (!(b.width > 0 && b.height > 0)) return;
+      var cx = b.x + b.width / 2;
+      cx = Math.max(56, Math.min(state.size.w - 56, cx));
+      bubble.style.left = cx + "px";
+      bubble.style.bottom = Math.max(36, state.size.h - b.y + 4) + "px";
+    } catch (err) { /* 包围盒不可用时保持默认位置 */ }
+  }
+
+  function priorityForce() {
+    var p = window.PIXI && PIXI.live2d && PIXI.live2d.MotionPriority;
+    return (p && p.FORCE) || 3;
+  }
+
+  function playMotion(group, index) {
+    var model = state.model;
+    if (!model || !group) return Promise.resolve(false);
+    var record = { group: group, index: typeof index === "number" ? index : null, ok: false, at: Date.now() };
+    state.lastMotion = record;
+    try {
+      var manager = model.internalModel && model.internalModel.motionManager;
+      if (manager && manager.stopAllMotions) manager.stopAllMotions();
+      return model.motion(group, index, priorityForce()).then(function (ok) {
+        record.ok = !!ok;
+        if (!ok) record.empty = true;
+        return !!ok;
+      }).catch(function (err) {
+        record.ok = false;
+        record.error = String(err && err.message ? err.message : err);
+        console.warn("[live2d] motion failed:", group, err);
+        return false;
+      });
+    } catch (err) {
+      record.ok = false;
+      record.error = String(err && err.message ? err.message : err);
+      console.warn("[live2d] motion threw:", group, err);
+      return Promise.resolve(false);
+    }
+  }
+
+  function playRegion(region) {
+    var group = REGION_MOTION[region];
+    if (!group) return Promise.resolve(false);
+    return playMotion(group).then(function (ok) {
+      if (!ok && group !== "TapBody") return playMotion("TapBody");
+      return ok;
+    });
+  }
+
+  function namedRegion(hits) {
+    if (!hits || !hits.length) return null;
+    var joined = hits.join(" ");
+    if (/眼睛|脸|face|eye/i.test(joined)) return "face";
+    if (/头|head|hair|ear|耳/i.test(joined)) return "head";
+    if (/手|arm|hand/i.test(joined)) return "armL";
+    if (/腿|脚|leg|foot/i.test(joined)) return "leg";
+    if (/身体|body|torso/i.test(joined)) return "body";
+    return null;
+  }
+
+  function classifyPoint(x, y) {
+    var model = state.model;
+    if (!model) return null;
+    var b;
+    try {
+      b = model.getBounds();
+    } catch (err) {
+      return null;
+    }
+    if (!(b.width > 0 && b.height > 0)) return null;
+    var nx = (x - b.x) / b.width;
+    var ny = (y - b.y) / b.height;
+    if (nx < 0 || nx > 1 || ny < 0 || ny > 1) return null;
+
+    var hits = [];
+    try {
+      if (model.hitTest) hits = model.hitTest(x, y) || [];
+    } catch (err) { /* 没有 HitArea 时忽略 */ }
+    var named = namedRegion(hits);
+    if (named) return named;
+
+    if (ny < CUTS.headMaxNy) {
+      if (ny > CUTS.faceMinNy && nx > CUTS.faceMinNx && nx < CUTS.faceMaxNx) return "face";
+      return "head";
+    }
+    if (ny < CUTS.legMinNy) {
+      if (nx < CUTS.bodyMinNx) return "armL";
+      if (nx > CUTS.bodyMaxNx) return "armR";
+      return "body";
+    }
+    return "leg";
+  }
+
+  function handleTap(x, y) {
+    var region = classifyPoint(x, y);
+    if (!region) return;
+
+    var now = Date.now();
+    if (region === "head" && now - state.lastHeadTap < 420) {
+      state.lastHeadTap = now;
+      say("猫耳…只给你看哦。");
+      playMotion("Extra", 0);
+      return;
+    }
+    if (region === "head") state.lastHeadTap = now;
+
+    say(pick(LINES[region] || LINES.body, state.lastLine));
+    playRegion(region);
+  }
+
+  function drawZones() {
+    if (!SHOW_ZONES || !state.model || !state.app) return;
+    var old = stage.querySelector(".lp-zones");
+    if (old) old.remove();
+    var b = state.model.getBounds();
+    var layer = document.createElement("div");
+    layer.className = "lp-zones";
+    layer.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:2";
+    var zones = [
+      ["head", 0, 0, 1, CUTS.headMaxNy, "rgba(56,189,248,.28)"],
+      ["face", CUTS.faceMinNx, CUTS.faceMinNy, CUTS.faceMaxNx - CUTS.faceMinNx, CUTS.headMaxNy - CUTS.faceMinNy, "rgba(244,114,182,.30)"],
+      ["armL", 0, CUTS.headMaxNy, CUTS.bodyMinNx, CUTS.legMinNy - CUTS.headMaxNy, "rgba(250,204,21,.25)"],
+      ["body", CUTS.bodyMinNx, CUTS.headMaxNy, CUTS.bodyMaxNx - CUTS.bodyMinNx, CUTS.legMinNy - CUTS.headMaxNy, "rgba(74,222,128,.25)"],
+      ["armR", CUTS.bodyMaxNx, CUTS.headMaxNy, 1 - CUTS.bodyMaxNx, CUTS.legMinNy - CUTS.headMaxNy, "rgba(250,204,21,.25)"],
+      ["leg", 0, CUTS.legMinNy, 1, 1 - CUTS.legMinNy, "rgba(167,139,250,.25)"]
+    ];
+    zones.forEach(function (z) {
+      var el = document.createElement("div");
+      el.style.cssText = "position:absolute;box-sizing:border-box;border:1px dashed rgba(255,255,255,.8);" +
+        "background:" + z[5] + ";font-size:10px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6);padding:1px 3px";
+      el.style.left = (b.x + z[1] * b.width) + "px";
+      el.style.top = (b.y + z[2] * b.height) + "px";
+      el.style.width = (z[3] * b.width) + "px";
+      el.style.height = (z[4] * b.height) + "px";
+      el.textContent = z[0];
+      layer.appendChild(el);
+    });
+    stage.appendChild(layer);
+  }
+
+  async function boot() {
+    if (state.booting || state.ready) return;
+    state.booting = true;
+
+    try {
+      if (!window.PIXI || !window.PIXI.live2d || !PIXI.live2d.Live2DModel) {
+        throw new Error("Live2D 运行库未加载（CDN 可能被拦截）");
+      }
+      applySize();
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var app = new PIXI.Application({
+        view: canvas,
+        width: state.size.w,
+        height: state.size.h,
+        backgroundAlpha: 0,
+        antialias: true,
+        resolution: dpr,
+        autoDensity: true,
+        powerPreference: "low-power"
+      });
+      state.app = app;
+      if (app.ticker) app.ticker.maxFPS = 60;
+
+      var model = await PIXI.live2d.Live2DModel.from(MODEL_URL, { autoInteract: true });
+      state.model = model;
+      app.stage.addChild(model);
+      fitModel();
+
+      var manager = model.internalModel && model.internalModel.motionManager;
+      if (manager && manager.on) {
+        manager.on("motionFinish", function () {
+          state.lastMotionFinished = Date.now();
+        });
+      }
+
+      root.dataset.state = "ready";
+      state.ready = true;
+      state.booting = false;
+      if (loading) loading.style.display = "none";
+      if (SHOW_ZONES) drawZones();
+      setTimeout(function () { say(pick(LINES.welcome)); }, 700);
+    } catch (err) {
+      state.booting = false;
+      root.dataset.state = "failed";
+      console.warn("[live2d] 初始化失败：", err);
+    }
+  }
+
+  function setHidden(hidden, persist) {
+    state.hidden = !!hidden;
+    root.dataset.state = hidden ? "hidden" : (state.ready ? "ready" : "loading");
+    if (hidden) {
+      if (state.app) state.app.ticker.stop();
+    } else {
+      if (state.app && !document.hidden) state.app.ticker.start();
+      if (!state.ready) boot();
+    }
+    if (persist !== false) {
+      try { localStorage.setItem(STORAGE_KEY, hidden ? "1" : "0"); } catch (err) { /* 隐私模式 */ }
+    }
+  }
+
+  // ---- 交互绑定 ----
+  var down = null;
+  canvas.addEventListener("pointerdown", function (e) {
+    if (e.button !== undefined && e.button !== 0) return;
+    down = { x: e.clientX, y: e.clientY, t: Date.now() };
+  });
+  canvas.addEventListener("pointerup", function (e) {
+    if (!down) return;
+    var dx = e.clientX - down.x;
+    var dy = e.clientY - down.y;
+    var moved = dx * dx + dy * dy > 64;
+    var elapsed = Date.now() - down.t;
+    down = null;
+    if (moved || elapsed > 700) return;
+    var rect = canvas.getBoundingClientRect();
+    handleTap(e.clientX - rect.left, e.clientY - rect.top);
+  });
+  canvas.addEventListener("pointercancel", function () { down = null; });
+  canvas.addEventListener("pointermove", function (e) {
+    if (!state.ready) return;
+    var rect = canvas.getBoundingClientRect();
+    var region = classifyPoint(e.clientX - rect.left, e.clientY - rect.top);
+    canvas.style.cursor = region ? "pointer" : "default";
+  });
+  canvas.addEventListener("pointerleave", function () {
+    canvas.style.cursor = "default";
+  });
+  canvas.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      say(pick(LINES.talk));
+      playMotion("TapFace");
+    }
+  });
+
+  root.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-act]");
+    if (!btn) return;
+    var act = btn.getAttribute("data-act");
+    if (act === "talk") {
+      say(pick(LINES.talk));
+      playMotion("TapFace");
+    } else if (act === "hide") {
+      setHidden(true);
+    } else if (act === "show") {
+      setHidden(false);
+    }
+  });
+
+  var lastWidth = window.innerWidth;
+  window.addEventListener("resize", function () {
+    if (window.innerWidth === lastWidth) return;
+    lastWidth = window.innerWidth;
+    applySize();
+    drawZones();
+  });
+  window.addEventListener("orientationchange", function () {
+    setTimeout(function () { applySize(); drawZones(); }, 300);
+  });
+
+  document.addEventListener("visibilitychange", function () {
+    if (!state.app) return;
+    if (document.hidden) {
+      state.app.ticker.stop();
+    } else if (!state.hidden) {
+      state.app.ticker.start();
+    }
+  });
+
+  // 偶尔主动搭话，但只在没有气泡、页面可见时
+  setInterval(function () {
+    if (!state.ready || state.hidden || document.hidden) return;
+    if (bubble.classList.contains("is-visible")) return;
+    if (Math.random() < 0.45) return;
+    say(pick(LINES.idle, state.lastLine));
+  }, 55000);
+
+  // 供调试 / 自动化测试
+  window.__live2dPet = {
+    get model() { return state.model; },
+    get ready() { return state.ready; },
+    get lastLine() { return state.lastLine; },
+    get lastMotion() { return state.lastMotion; },
+    get lastMotionFinished() { return state.lastMotionFinished; },
+    classify: classifyPoint,
+    play: playMotion,
+    say: say,
+    regions: REGION_MOTION,
+    cuts: CUTS,
+    lines: LINES,
+    motionGroups: function () {
+      var m = state.model;
+      var defs = m && m.internalModel && m.internalModel.motionManager && m.internalModel.motionManager.definitions;
+      return defs ? Object.keys(defs) : [];
+    },
+    bounds: function () {
+      try { return state.model ? state.model.getBounds() : null; } catch (err) { return null; }
+    },
+    regionCenters: function () {
+      var m = state.model;
+      if (!m) return null;
+      var b = m.getBounds();
+      var rect = canvas.getBoundingClientRect();
+      var pts = {
+        head: [0.5, 0.03],
+        face: [0.5, 0.17],
+        body: [0.5, 0.45],
+        armL: [0.12, 0.45],
+        armR: [0.88, 0.45],
+        leg: [0.5, 0.82]
+      };
+      var out = {};
+      Object.keys(pts).forEach(function (k) {
+        out[k] = {
+          x: rect.left + b.x + b.width * pts[k][0],
+          y: rect.top + b.y + b.height * pts[k][1]
+        };
+      });
+      return out;
+    }
+  };
+
+  // 初始状态
+  var savedHidden = false;
+  try { savedHidden = localStorage.getItem(STORAGE_KEY) === "1"; } catch (err) { /* ignore */ }
+  applySize();
+  if (savedHidden) {
+    setHidden(true, false);
+  } else {
+    setHidden(false, false);
+  }
+})();
+</script>
