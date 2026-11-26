@@ -7,5 +7,6 @@ tags: ["鸣潮"]
 categories: ["生活"]
 math: true
 ---
-![](birthday.png)
+![图片](/images/birthday.png)
+
 第二次在鸣潮过生日口牙

@@ -1,0 +1,14 @@
+{{- /* 幻梦 Illusion v1.1.0 - 站点级覆盖：CSS 加载模板 */ -}}
+{{- /*
+  ⚠️ 本文件是主题 layouts/partials/_layout/head/css.html 的副本。
+  唯一改动：在主样式表之后追加站点自定义样式 assets/css/custom.css。
+  升级主题时请对比主题同名文件，把主样式表的编译参数同步过来。
+*/ -}}
+{{- $opts := dict "transpiler" "dartsass" "targetPath" "css/style.css" "outputStyle" "compressed" "enableSourceMap" (not hugo.IsProduction) }}
+{{- with resources.Get "scss/main.scss" | toCSS $opts | minify | fingerprint -}}
+<link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous">
+{{- end -}}
+{{- /* ===== 站点自定义样式（必须在主样式之后，才能覆盖主题 token） ===== */ -}}
+{{- with resources.Get "css/custom.css" | minify | fingerprint -}}
+<link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous">
+{{- end -}}

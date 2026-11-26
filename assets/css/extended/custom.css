@@ -188,3 +188,36 @@ body, .main, .header, .footer, .post-entry, a, h1, h2, h3, h4, p, span, div {
 body {
     transition: background-image 0.4s ease, background-color 0.4s ease, color 0.4s ease !important;
 }
+/* 1. 引入优雅的字体（思源宋体 + 等宽代码体） */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
+
+body {
+    font-family: 'Noto Serif SC', -apple-system, sans-serif;
+    line-height: 1.8; /* 增加行高 */
+    letter-spacing: 0.02em; /* 微微拉开字距 */
+}
+
+/* 2. 控制阅读宽度 */
+:root {
+    --main-width: 780px; /* 限制内容宽度，增加两侧留白 */
+}
+
+/* 3. 代码块质感优化 */
+.post-content pre code {
+    font-family: 'JetBrains Mono', 'Consolas', monospace; /* 优雅的代码字体 */
+    line-height: 1.6;
+    border-radius: 6px; /* 克制的圆角 */
+}
+
+/* 4. 极简卡片边框 */
+.post-entry {
+    border: 1px solid rgba(128, 128, 128, 0.15); /* 极细的边框代替阴影 */
+    box-shadow: none; /* 去掉默认阴影 */
+    background: transparent; /* 如果背景图好看，可以让卡片背景透明 */
+}
+
+/* 5. 柔和的暗黑模式 */
+:root[data-theme="dark"] {
+    --theme: #121212; /* 深灰底色 */
+    --entry: #1e1e1e;
+}

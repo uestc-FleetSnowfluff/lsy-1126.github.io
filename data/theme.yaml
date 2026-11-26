@@ -1,0 +1,481 @@
+# ============================================================================
+# 幻梦 Illusion v1.1.0 —— 站点数据文件（data/theme.yaml）
+# ============================================================================
+# 本文件是主题的“唯一数据源”：首页、关于、技能、友链、404、布局开关
+# 全部从这里读取。模板里通过 hugo.Data.theme.xxx 访问。
+#
+# 迁移说明（PaperMod → 幻梦）：
+#   1. 旧 hugo.yaml 里的 profileMode / socialIcons / 菜单已分别对应到
+#      本文件的 home.hero、social.links 与站点 hugo.yaml 的 menus。
+#   2. 头像、背景图改为引用 static/ 下的真实文件。
+#   3. 友链从旧 content/links.md 的 Markdown 表格搬到了 friends.friends。
+#   4. 文末 layout 段集中控制毛玻璃、粒子、3D 倾斜、滚动淡入等特效。
+# ============================================================================
+
+
+# ============================================================================
+# 首页（Home）
+# ============================================================================
+home:
+
+  # ----- Hero 首屏 -----
+  hero:
+    title: "uestc-fleetsnowfluff"          # 首屏主标题
+    greeting: "你好，我是"                  # 主标题前的问候语
+    badgeText: "欢迎来到我的世界"           # 首屏顶部小徽章
+
+    subtitles:                             # 打字机轮播的副标题
+      - "ML 开发者"
+      - "生活记录者"
+      - "在代码里造梦的人"
+      - "大一学习中"
+
+    description: "这里记录机器学习的学习笔记与思考，也顺手记下生活里的碎片。"
+
+    primaryBtn:
+      text: "阅读文章"
+      url: "/posts/"
+
+    secondaryBtn:
+      text: "翻翻归档"
+      url: "/archives/"
+
+    quote:
+      text: "代码是诗，键盘是笔，屏幕是画布。"
+      author: "uestc-fleetsnowfluff"
+
+  # ----- 最新文章板块 -----
+  posts:
+    title: "最新文章"
+    subtitle: "分享思考，记录成长"
+    count: 6                               # 首页展示的文章数量
+    showMore:
+      text: "查看所有文章"
+      url: "/posts/"
+
+  # ----- 关于我板块 -----
+  about:
+    title: "关于 uestc-fleetsnowfluff"
+    description: "机器学习方向的学生，喜欢把学到的东西写下来，也喜欢折腾博客主题和 Live2D 看板娘。"
+    btnText: "看看归档"
+    btnUrl: "/archives/"
+
+  # ----- 技术栈板块 -----
+  skills:
+    title: "技术栈"
+    subtitle: "不断学习，持续进步"
+    count: 6
+
+
+# ============================================================================
+# 关于页（About）
+# 目前站点没有 /about/ 页面，这里的数据先填好，将来加页面时可直接复用。
+# ============================================================================
+about:
+
+  intro:
+    name: "uestc-fleetsnowfluff"
+    title: "ML 开发者 · 学生 "
+    quote: "把学到的东西写下来，才不会白学。"
+
+  stats:
+    - icon: "fas fa-code"
+      number: "auto"
+      label: "技术文章"
+    - icon: "fas fa-project-diagram"
+      number: "auto"
+      label: "技术技能"
+    - icon: "fas fa-calendar-alt"
+      number: "1+"
+      label: "写博客年限"
+    - icon: "fas fa-heart"
+      number: "∞"
+      label: "热爱程度"
+
+  philosophy:
+    title: "技术理念"
+    items:
+      - icon: "fas fa-feather-alt"
+        title: "先跑通再优化"
+        description: "先把能工作的版本做出来，再谈优雅。"
+      - icon: "fas fa-graduation-cap"
+        title: "持续学习"
+        description: "大一刚开始，慢慢把数学和工程都补上。"
+      - icon: "fas fa-share-alt"
+        title: "分享共赢"
+        description: "写笔记是最好的复习方式，也方便别人少踩坑。"
+      - icon: "fas fa-user-check"
+        title: "用户体验"
+        description: "博客首先是给自己看的，所以要顺手、要好看。"
+
+  contact:
+    title: "保持联系"
+    subtitle: "有想法、有问题，或者只是想打个招呼"
+    methods:
+      - type: "email"
+        icon: "fas fa-envelope"
+        label: "邮箱"
+        value: "2435223671@qq.com"
+        link: "mailto:2435223671@qq.com"
+      - type: "github"
+        icon: "fab fa-github"
+        label: "GitHub"
+        value: "uestc-fleetsnowfluff"
+        link: "https://github.com/uestc-fleetsnowfluff"
+      - type: "website"
+        icon: "fas fa-globe"
+        label: "网站"
+        value: "uestc-fleetsnowfluff.github.io"
+        link: "https://uestc-fleetsnowfluff.github.io/"
+    note: "欢迎交流机器学习和日常生活。"
+
+
+# ============================================================================
+# 图片资源（Assets）
+# ============================================================================
+assets:
+
+  # ----- 站点头像 -----
+  avatar:
+    url: "/images/avatar.png"
+    alt: "站点头像"
+
+  # ----- 背景图 -----
+  # 每次加载页面，从 random.images 里随机取一张（模板见 themes/illusion/layouts/_default/baseof.html）。
+  # 背景图之上会叠一层跟随主题的遮罩（--overlay），所以深浅色共用同一组图即可。
+  background:
+
+    # 随机背景（推荐）
+    random:
+      enabled: true
+      images:
+        - "/images/bg1.jpg"
+        - "/images/bg2.jpg"
+        - "/images/bg3.jpg"
+        - "/images/bg4.jpg"
+
+    # 以下三项是「随机未启用」时的兜底单图；mobile / desktop 目前只是占位，模板未使用。
+    mobile:
+      url: "/images/bg1.jpg"
+      alt: "移动端背景"
+
+    desktop:
+      url: "/images/bg1.jpg"
+      alt: "桌面端背景"
+
+    adaptive:
+      url: "/images/bg1.jpg"
+      alt: "自适应背景"
+      description: "随机背景关闭时使用的兜底图"
+
+  # ----- OpenGraph 分享图 -----
+  openGraph:
+    default:
+      url: "/images/avatar.png"
+      alt: "分享配图"
+      width: 1200
+      height: 630
+
+  # ----- 默认占位 -----
+  defaults:
+    postCover: ""                          # 留空：无封面时卡片走纯毛玻璃占位，不插空 img
+    friendAvatar: "/images/friends/default.png"
+    skillIcon: "fas fa-code"
+
+
+# ============================================================================
+# 社交链接（social）
+# 对应旧 PaperMod 的 params.socialIcons，顺序即图标顺序。
+# ============================================================================
+social:
+
+  links:
+    - platform: "github"
+      url: "https://github.com/uestc-fleetsnowfluff"
+      icon: "fab fa-github"
+      label: "GitHub"
+      show: true
+
+    - platform: "email"
+      url: "mailto:2435223671@qq.com"
+      icon: "fas fa-envelope"
+      label: "邮箱"
+      show: true
+
+    - platform: "rss"
+      url: "/index.xml"
+      icon: "fas fa-rss"
+      label: "RSS 订阅"
+      show: true
+
+    - platform: "twitter"
+      url: "https://twitter.com"
+      icon: "fab fa-twitter"
+      label: "Twitter"
+      show: false
+
+    - platform: "telegram"
+      url: "https://telegram.org"
+      icon: "fab fa-telegram"
+      label: "Telegram"
+      show: false
+
+    - platform: "wechat"
+      url: ""
+      icon: "fab fa-weixin"
+      label: "微信"
+      show: false
+
+
+# ============================================================================
+# 技能（Skills）
+# 首页“技术栈”板块与页脚标签都取 skills.skills 的前若干项。
+# ============================================================================
+skills:
+
+  overview:
+    categories:
+      - icon: "fas fa-brain"
+        title: "机器学习"
+        description: "PyTorch、Transformer、训练与调参"
+        progress: 70
+      - icon: "fas fa-square-root-alt"
+        title: "数学基础"
+        description: "线性代数、概率统计、微积分"
+        progress: 65
+      - icon: "fab fa-python"
+        title: "Python 工程"
+        description: "NumPy、Pandas、脚本与数据处理"
+        progress: 80
+      - icon: "fas fa-tools"
+        title: "开发工具"
+        description: "Git、VS Code、Hugo、LaTeX"
+        progress: 70
+
+  skills:
+    - name: "Python"
+      level: 80
+      description: "日常主力语言，用来写训练脚本、数据清洗和小工具。"
+      projects:
+        - "nanoGPT 复现笔记"
+        - "位置编码实验"
+    - name: "PyTorch"
+      level: 70
+      description: "能独立搭小模型、写训练循环、读官方教程和源码。"
+      projects:
+        - "nanoGPT 复现"
+    - name: "NumPy"
+      level: 75
+      description: "矩阵运算、广播机制、向量化改造。"
+      projects: []
+    - name: "LaTeX"
+      level: 65
+      description: "用于数学公式排版和课程报告。"
+      projects: []
+    - name: "Git"
+      level: 70
+      description: "版本管理、分支、GitHub Actions 部署博客。"
+      projects:
+        - "本博客的自动部署流水线"
+    - name: "Hugo"
+      level: 60
+      description: "主题定制、模板改造、资源管道调优。"
+      projects:
+        - "PaperMod → 幻梦主题迁移"
+    - name: "HTML / CSS"
+      level: 55
+      description: "能读懂模板、改样式，前端不算专业但够用。"
+      projects: []
+    - name: "JavaScript"
+      level: 50
+      description: "看得懂主题脚本，能改小交互（比如 Live2D 看板娘）。"
+      projects:
+        - "Live2D 看板娘接入"
+
+  timeline:
+    - year: "2025"
+      title: "起步"
+      description: "接触 Python 和机器学习，开始写第一份学习笔记。"
+    - year: "2026"
+      title: "深入"
+      description: "系统学习 Transformer 与位置编码，搭起自己的博客。"
+
+
+# ============================================================================
+# 友链（Friends）
+# 由旧 content/links.md 的表格迁移而来。
+# ============================================================================
+friends:
+
+  page:
+    title: "友链"
+    subtitle: "这里是我常去的一些朋友和有趣的网站"
+
+  friends:
+    - name: "飞行雪绒的博客"
+      url: "https://uestc-fleetsnowfluff.github.io/"
+      avatar: "/images/avatar.png"
+      description: "正是本站！！"
+      category: "本站"
+
+    - name: "azusaaa"
+      url: "https://azusaaa.com/"
+      avatar: "/images/friends/azusaaa.png"
+      description: "工作室的网安成员"
+      category: "安全"
+
+    - name: "寒叶的小站"
+      url: "https://hanye.netlify.app"
+      avatar: "/images/friends/hanye.png"
+      description: "充满好奇心的学生，不懈造梦的人"
+      category: "个人博客"
+
+    - name: "木果的 live2d 网站"
+      url: "https://aimisi520.com/"
+      avatar: "/images/friends/muguo.png"
+      description: "特别鸣谢，Live2D 模型提供者（模型不可用于商用）"
+      category: "特别鸣谢"
+
+  apply:
+    title: "申请友链"
+    conditions:
+      - "有持续更新的原创内容"
+      - "站点可以正常访问"
+      - "无不良内容"
+      - "已在你的站点添加本站链接"
+    siteInfo:
+      name: "uestc-fleetsnowfluff's Blog"
+      url: "https://uestc-fleetsnowfluff.github.io/"
+      description: "uestc-fleetsnowfluff 的个人博客 —— ML 开发 + 生活"
+    contactTitle: "联系方式"
+    contactDescription: "符合条件的话，通过下面任一方式告诉我："
+    contactMethods:
+      - icon: "fas fa-envelope"
+        label: "发送邮件"
+        link: "mailto:2435223671@qq.com"
+      - icon: "fab fa-github"
+        label: "GitHub"
+        link: "https://github.com/uestc-fleetsnowfluff"
+
+
+# ============================================================================
+# 404 页面
+# ============================================================================
+error404:
+
+  page:
+    title: "404"
+    description: "页面不存在或已被移除"
+    message: "抱歉，你访问的页面不存在。可能已被删除，或者链接写错了。"
+    icon: "fas fa-ghost"
+
+  buttons:
+    home:
+      text: "返回首页"
+      icon: "fas fa-home"
+      url: "/"
+    posts:
+      text: "浏览文章"
+      icon: "fas fa-file-alt"
+      url: "/posts/"
+
+
+# ============================================================================
+# 标签页
+# ============================================================================
+tags:
+  page:
+    title: "标签"
+    subtitle: "浏览所有文章标签"
+    perPage: 25
+
+
+# ============================================================================
+# 布局与视觉策略（layout）
+# ============================================================================
+layout:
+
+  posts:
+    layout: "grid"                         # grid 网格 / list 列表
+    columns: 2
+    perPage: 12
+    excerptLength: 160
+    showDate: true
+    showCategory: true
+    showTags: true
+    showExcerpt: true
+
+  skills:
+    layout: "grid"
+    showCategories: true
+    showDetailed: true
+    showTimeline: true
+    showProjects: true
+
+  links:
+    showCategory: true
+
+  sidebar:
+    position: "right"
+    showTOC: true
+    showInfo: true
+    showTags: true
+
+  codeblock:
+    showLang: true
+    showCopy: true
+    expandLines: 0
+    lineNumbers: false
+
+  # ----- 全局视觉特效（毛玻璃 / 粒子 / 3D 倾斜 / 滚动淡入） -----
+  effects:
+    enabled: true
+    glass: true
+    aurora: true
+    mouseGlow: true
+    card3d: true
+    cardShine: true
+    scrollReveal: true
+    particles: true
+    nightSky: true
+    noise: true
+
+  hero:
+    enhanced: true
+    aurora: true
+    glass: true
+    mouseGlow: true
+    particles: true
+    floating: true
+
+  cards:
+    glass: true
+    lift: true
+    glow: true
+    mouseGlow: true
+    tilt: true
+    imageZoom: true
+
+  article:
+    readingProgress: true
+    enhancedHeader: true
+    coverEffect: true
+    readableLayout: true
+    relatedPosts: true
+
+  performance:
+    auto: true
+    level: "normal"
+    respectReducedMotion: true
+    pauseWhenHidden: true
+    reduceOnMobile: true
+    reduceOnLowPower: true
+    adaptiveDpr: true
+    adaptiveParticles: true
+    adaptiveFps: true
+
+  accessibility:
+    reducedMotion: true
+    keyboardNavigation: true
+    visibleFocus: true
+    decorativeEffectsPointerEventsNone: true

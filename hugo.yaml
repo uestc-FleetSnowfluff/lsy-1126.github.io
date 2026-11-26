@@ -1,58 +1,155 @@
+# =============================================================================
+# 幻梦 Illusion v1.1.0 —— 站点主配置
+# 由 PaperMod 的 hugo.yaml 迁移而来，配置项对齐主题自带的 hugo.toml。
+# 说明：Hugo 不会合并主题目录里的 hugo.toml，因此必需项必须在站点配置中显式声明。
+# =============================================================================
+
+# ========== 站点基本信息 ==========
 baseURL: "https://uestc-fleetsnowfluff.github.io/"
-title: "uestc-fleetsnowfluff's Blog"
-theme: "PaperMod"
 locale: "zh-CN"
+languageName: "中文"
+title: "uestc-fleetsnowfluff's Blog"
+theme: "illusion"
+defaultContentLanguage: "zh"
+defaultContentLanguageInSubdir: false
+# 文章页显示基于 Git 的最后更新时间（主题仅用于展示，不依赖它做逻辑判断）
+enableGitInfo: true
 
-# 开启首页的个人简介和社交图标
+# ========== 功能开关与个人信息 ==========
 params:
+  # ----- 个人信息 -----
   author: "uestc-fleetsnowfluff"
-  description: "This is uestc-fleetsnowfluff's personal Blog"
-  ShowReadingTime: true      # 显示阅读时间
-  ShowShareButtons: true     # 显示分享按钮
-  ShowPostNavLinks: true     # 显示上一篇/下一篇
-  ShowBreadCrumbs: true      # 显示面包屑导航
-  ShowCodeCopyButtons: true  # 代码块显示复制按钮
-  mainSections: ["posts"]
-  socialIcons:
-    - name: "github"
-      url: "https://github.com/uestc-fleetsnowfluff"
-    - name: "email"
-      url: "mailto:2435223671@qq.com"
-    - name: "rss"
-      url: "https://uestc-fleetsnowfluff.github.io/index.xml"
-  profileMode:
-    enabled: true            # 开启首页个人资料模式
-    title: "uestc-fleetsnowfluff"
-    subtitle: "ML开发+生活"
-    imageUrl: "/images/avatar.png" # 这里的路径对应 static 文件夹里的图片
-    imageWidth: 120          # 头像宽度
-    imageHeight: 120         # 头像高度
+  description: "uestc-fleetsnowfluff 的个人博客 —— ML 开发 + 生活"
+  email: "2435223671@qq.com"
+  github: "uestc-fleetsnowfluff"
+  domain: "uestc-fleetsnowfluff.github.io"
+  # 建站时间，用于页脚“已运行 xxx 天”
+  siteTime: "2026-11-22T20:42:05+08:00"
 
-# 顶部导航菜单
-menu:
+  # ----- 功能开关 -----
+  enableDarkMode: true
+  enableSearch: true
+  searchProvider: "local"          # 本地 JSON 索引搜索，Ctrl+K 唤起
+  enableParticles: true            # Canvas 粒子背景（深浅色两套）
+  enable3DEffects: true            # 卡片 3D 倾斜
+  enableScrollAnimations: true     # 滚动淡入
+  enableTypewriter: true           # 首页副标题打字机
+  enableAccessibility: true
+  enableTOC: true                  # 文章目录
+  enableComments: false            # 评论总开关，需要时改成 true 并填下面的参数
+  lazyLoadImages: true
+  # ----- 数学公式（原生 KaTeX） -----
+  # 需配合文件末尾 markup.goldmark.extensions.passthrough 使用；
+  # 单篇文章可用 Front Matter 的 math: false 关闭。
+  enableMath: true
+
+  # ----- SEO 与社交分享 -----
+  enableSchema: true
+  enableOpenGraph: true
+  enableTwitterCards: true
+
+  # ----- 评论系统（可选: disqus | utterances | giscus | twikoo | waline | artalk） -----
+  commentsProvider: "giscus"
+
+  disqusShortname: ""
+
+  utterancesRepo: ""
+  utterancesIssueTerm: "pathname"
+
+  giscusRepo: ""
+  giscusRepoId: ""
+  giscusCategory: ""
+  giscusCategoryId: ""
+  giscusMapping: "pathname"
+  giscusStrict: "0"
+  giscusReactions: "1"
+  giscusEmitMetadata: "0"
+  giscusInputPosition: "bottom"
+  giscusLang: "zh-CN"
+
+  twikooEnvId: ""
+  twikooRegion: ""
+  twikooLang: "zh-CN"
+
+  walineServerURL: ""
+  walineLang: "zh-CN"
+  walinePageSize: 10
+  walineMeta:
+    - "nick"
+    - "mail"
+    - "link"
+  walineRequiredMeta:
+    - "nick"
+    - "mail"
+
+  artalkServer: ""
+  artalkSite: ""
+  artalkPlaceholder: "说点什么吧..."
+  artalkDarkMode: "auto"
+
+# ========== 导航菜单 ==========
+menus:
   main:
-    - identifier: home
-      name: 首页
-      url: /
+    - name: "首页"
+      url: "/"
+      weight: 5
+      params:
+        icon: "fas fa-home"
+    - name: "文章"
+      url: "/posts/"
       weight: 10
-    - identifier: archives
-      name: 归档
-      url: /archives/
+      params:
+        icon: "fas fa-file-alt"
+    - name: "归档"
+      url: "/archives/"
       weight: 20
-    - identifier: search
-      name: 搜索
-      url: /search/
+      params:
+        icon: "fas fa-archive"
+    - name: "标签"
+      url: "/tags/"
       weight: 30
-    - identifier: tags
-      name: 标签
-      url: /tags/
+      params:
+        icon: "fas fa-tags"
+    - name: "友链"
+      url: "/links/"
       weight: 40
-    - identifier: links
-      name: 友链
-      url: /links/
-      weight: 50  # 数字越大，在菜单里越靠后
+      params:
+        icon: "fas fa-link"
+
+# ========== Markdown 渲染与代码高亮 ==========
+markup:
+  highlight:
+    codeFences: true
+    guessSyntax: true
+    noClasses: false
+    tabWidth: 2
+    lineNos: false
+
+  goldmark:
+    extensions:
+      # 关键：让 Goldmark 跳过公式定界符内的内容，原样交给前端 KaTeX 排版。
+      # 少了这段，公式里的 _ * \ 会被当成 Markdown 语法吃掉。
+      passthrough:
+        enable: true
+        delimiters:
+          block:
+            - ['\[', '\]']
+            - ['$$', '$$']
+          inline:
+            - ['\(', '\)']
+            - ['$', '$']
+
+# ========== 输出格式 ==========
+# home 需要 JSON：本地搜索的索引文件由 layouts/_default/index.json 生成。
 outputs:
-  home:
-    - HTML
-    - RSS
-    - JSON
+  home: ["HTML", "JSON", "RSS"]
+  page: ["HTML"]
+  section: ["HTML", "RSS"]
+  taxonomy: ["HTML", "RSS"]
+  term: ["HTML", "RSS"]
+
+# ========== 站点地图 ==========
+sitemap:
+  changefreq: "weekly"
+  filename: "sitemap.xml"
+  priority: 0.5

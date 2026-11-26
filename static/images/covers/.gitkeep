@@ -1,0 +1,4 @@
+# 文章封面存放目录。
+# 用法：把图片放进来（如 cover-1.jpg），并在文章 Front Matter 里写
+#   image: "/images/covers/cover-1.jpg"
+# 不写 image 时，幻梦会用自带毛玻璃/纯色占位，卡片正常显示且不会报错。

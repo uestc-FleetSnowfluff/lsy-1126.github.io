@@ -155,12 +155,18 @@
     #live2d-pet { right: 10px; bottom: 12px; }
     #live2d-pet .lp-bubble { max-width: 168px; font-size: 12px; }
   }
-  /* PaperMod 的“回到顶部”按钮默认也在右下角，挪到看板娘左侧，避免遮挡 */
+  /* 幻梦的右侧浮动按钮组（.scroll-buttons，返回顶部/搜索/主题/到底部）
+     固定在 right:var(--sp-2) bottom:var(--sp-2) 且 z-index:999，
+     和看板娘完全重叠会挡住点击，所以把它整体左移到看板娘左侧并排。
+     宽度取值与下方 petSize() 保持一致：桌面 250px，移动端 min(180px, 42vw)。 */
   @media (min-width: 641px) {
-    .top-link { right: calc(18px + 250px + 20px); }
+    .scroll-buttons { right: calc(18px + 250px + 18px); }
   }
   @media (max-width: 640px) {
-    .top-link { right: calc(10px + min(180px, 42vw) + 16px); bottom: 3rem; }
+    .scroll-buttons {
+      right: calc(10px + min(180px, 42vw) + 12px);
+      bottom: 12px;
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     #live2d-pet .lp-stage,
