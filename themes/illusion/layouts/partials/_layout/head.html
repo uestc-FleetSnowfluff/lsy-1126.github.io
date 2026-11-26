@@ -3,6 +3,38 @@
 {{- /* ========== 基础元数据 ========== */ -}}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{{- /* ==========================================================================
+     主题初始化（关键：必须位于所有 CSS 之前，且同步执行）
+     --------------------------------------------------------------------------
+     为什么放这里：
+       主题原本由 main.js 里的 ThemeManager 设置 <html data-theme>，而 main.js 是
+       <script defer> 加载的 —— defer 要等 HTML 解析完才执行，浏览器此时已经用
+       :root 的默认浅色变量渲染过一帧，于是深色模式用户会先看到白屏闪一下（FOUC）。
+       把同样的决策逻辑前置到 <head> 顶部、同步执行，CSS 到达前 data-theme 就已经
+       就位，首帧直接是对应主题。
+
+     与 ThemeManager 的约定必须保持一致（改一处就要同步改 main.ts）：
+       - localStorage 键名：'theme'
+       - 取值：'light' | 'dark' | 'system'
+       - 'system' → 按 prefers-color-scheme 解析成 light/dark
+       这里只读不写 localStorage，运行时切换仍由 ThemeManager 负责，
+       两者算出的结果相同，后执行的 ThemeManager 只是一次无副作用的重复赋值。
+     ========================================================================== */ -}}
+<script>
+  (function () {
+    var mode = 'system';
+    try {
+      mode = localStorage.getItem('theme') || 'system';
+    } catch (e) {
+      /* 隐私模式 / 禁用存储时 localStorage 会抛异常，退回跟随系统 */
+    }
+    /* 只接受 light / dark，其余（含 system、脏数据）一律按系统偏好解析 */
+    if (mode !== 'light' && mode !== 'dark') {
+      mode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', mode);
+  })();
+</script>
 <meta name="description" content="{{ .Site.Params.description | default (i18n "sitedescription") }}">
 <meta name="author" content="{{ .Site.Params.author | default (i18n "siteauthor") }}">
 <meta name="keywords" content="{{ .Site.Params.keywords | default (i18n "sitekeywords") }}">
@@ -11,7 +43,10 @@
 <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ printf "%s | %s" .Title site.Title }}{{ end }}</title>
 
 {{- /* SVG 图标 */ -}}
-<link rel="icon" type="image/svg+xml" href="{{ "/favicon.svg" | relURL }}">
+{{- /* 站点定制：favicon 换成头像（原为 /favicon.svg） */ -}}
+<link rel="icon" href="{{ "/favicon.ico" | relURL }}" sizes="any">
+<link rel="icon" type="image/png" sizes="64x64" href="{{ "/favicon.png" | relURL }}">
+<link rel="apple-touch-icon" sizes="180x180" href="{{ "/apple-touch-icon.png" | relURL }}">
 
 {{- /* ========== 资源预连接和 DNS 预解析 ========== */ -}}
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">

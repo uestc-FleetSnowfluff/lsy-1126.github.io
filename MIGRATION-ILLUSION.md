@@ -271,7 +271,76 @@ assets:
 
 ---
 
-## 8. 备份 / 回滚
+## 8. 站点图标（favicon）
+
+浏览器标签页的图标原来用的是主题自带的 `/favicon.svg`（幻梦 logo），现在换成头像 `assets/images/avatar.png`。
+
+由头像生成三个文件，放在 `static/` 根目录：
+
+| 文件 | 尺寸 | 用途 |
+| --- | --- | --- |
+| `favicon.png` | 64×64 | 主图标（Chrome / Edge / Firefox） |
+| `favicon.ico` | 16 / 32 / 48 / 64 多尺寸 | 旧浏览器、Windows 快捷方式兜底 |
+| `apple-touch-icon.png` | 180×180 | iOS 添加到主屏 |
+
+图标声明改在主题 `themes/illusion/layouts/partials/_layout/head.html`：
+
+```html
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="64x64" href="/favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+```
+
+注意：
+
+- 主题的 `themes/illusion/static/favicon.svg` 仍会被发布，但已经没有引用，可以不管。
+- **升级主题会覆盖 `head.html`**，这一处要重做（搜 `favicon.svg`）。
+- 换图标：直接替换 `static/` 下这三个文件即可，尺寸保持一致。
+- 浏览器对 favicon 缓存很顽固：本地看不到就用 `Ctrl+F5` 或开新标签页；线上还要等 GitHub Actions 部署完成。
+
+---
+
+## 9. 深色模式 FOUC（首屏闪白）修复
+
+**现象**：深色模式用户打开页面，先看到一帧浅色（白屏），随后才切成深色。
+
+**原因链**：
+
+1. `data-theme` 由 `assets/ts/main.ts` 里的 `ThemeManager` 设置（`setThemeImmediately()` → `applyTheme()`）；
+2. 这个 TS 被打包成 `main.js`，由 `layouts/partials/_layout/head/js.html` 用 **`<script defer src=...>`** 加载；
+3. `defer` 必须等 HTML 解析完才执行，此时浏览器已经用 `:root` 的默认**浅色**变量渲染过一帧；
+4. 而 `main.scss` 里**没有任何 `@media (prefers-color-scheme)` 兜底**（全站只有 `:root` 与 `[data-theme='light'|'dark']`），所以这段空窗期必然是浅色。
+
+**修复**：在 `themes/illusion/layouts/partials/_layout/head.html` 的 `<head>` 顶部（`<meta charset>` / viewport 之后、**所有 CSS 之前**）插入一段**内联同步**脚本，把 `ThemeManager` 的决策逻辑提前：
+
+```html
+<script>
+  (function () {
+    var mode = 'system';
+    try { mode = localStorage.getItem('theme') || 'system'; } catch (e) {}
+    if (mode !== 'light' && mode !== 'dark') {
+      mode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', mode);
+  })();
+</script>
+```
+
+要点：
+
+- **没有 `defer` / `async`**，同步执行；CSS 到达前 `data-theme` 已就位，首帧就是正确主题。
+- 必须与 `ThemeManager` 的契约一致：localStorage 键名 `theme`，取值 `light` / `dark` / `system`，`system` 按 `prefers-color-scheme` 解析。**改任何一处都要同步另一处**。
+- 脚本**只读不写** localStorage；运行时切换仍由 `ThemeManager` 负责，它随后会再赋一次同样的值（无副作用）。
+- `localStorage` 在隐私模式/禁用存储时会抛异常，已用 `try/catch` 兜底为跟随系统；脏数据（非 light/dark）同样按系统偏好解析。
+- `<meta charset>` 仍保持在最前（规范要求前 1024 字节内出现字符集声明），脚本紧随其后；脚本约 400 字节，不影响字符集探测。
+- 位置验证（构建产物字符索引）：主题脚本 **281** → 首个 `<link rel="stylesheet">` **1160** → `fonts.css` 1190 → `main.js` 3049。
+- 9 种组合（dark / light / system / 空值 / 脏数据 / 存储被禁用 × 系统深色/浅色）已用 Node 按真实产物里的脚本模拟执行，结果与 `ThemeManager` 完全一致。
+
+**升级注意**：这段写在主题 `head.html` 里，升级主题会被覆盖，需要重做（搜 `prefers-color-scheme`）。
+
+---
+
+## 10. 备份 / 回滚
 
 迁移前的状态都在 git 里（上一个提交）。
 
