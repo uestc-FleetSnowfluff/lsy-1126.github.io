@@ -153,6 +153,11 @@ assets:
         - "/images/bg2.jpg"
         - "/images/bg3.jpg"
         - "/images/bg4.jpg"
+        - "/images/bg5.png"
+        - "/images/bg6.jpg"
+        - "/images/bg7.jpg"
+        - "/images/bg8.png"
+        - "/images/bg9.png"
 
     # 以下三项是「随机未启用」时的兜底单图；mobile / desktop 目前只是占位，模板未使用。
     mobile:
