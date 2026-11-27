@@ -119,6 +119,25 @@ GitHub / 邮箱 / RSS 已按原配置开启，Twitter / Telegram / 微信保留�
 `content/links.md` 现在只剩 Front Matter 的 `layout: "links"`。
 4 位友链已迁移，头像占位图放在 `static/images/friends/`。
 
+### 图片放哪里：`static/` 才会被发布，`assets/` 不会
+
+`assets/` 只是资源管道的输入目录（`resources.Get`、图片处理），**里面的文件不会自动出现在网站根目录**；
+只有 `static/` 下的文件会被原样发布到 `public/`。
+
+踩过的坑：`data/theme.yaml` 里 `/images/avatar.png` 被引用了 4 处——首页「关于」卡片、友链「本站」、
+OpenGraph 分享图、Schema.org logo——但文件当时只存在于 `assets/images/avatar.png`，
+所以这 4 个位置全部 404，头像显示不出来。
+
+现在的约定：
+
+| 路径 | 说明 |
+| --- | --- |
+| `assets/images/avatar.png` | 1536×1536 母版，保留不动 |
+| `static/images/avatar.png` | 实际发布的 512×512 版本（331 KB），页面与 OG 都引用它 |
+
+**换头像**：替换 `static/images/avatar.png` 即可（想同时更新母版就两张一起换）。
+用 512px 是因为主题里头像最大显示 140×140，2~3 倍屏也够；直接放 1536 的母版会白多下载 2 MB。
+
 ---
 
 ## 3. 文章封面（已预留）
